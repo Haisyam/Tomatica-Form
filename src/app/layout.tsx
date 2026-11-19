@@ -8,8 +8,24 @@ const robotoFlex = Roboto_Flex({
   display: "swap",
 });
 
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    const u = process.env.NEXT_PUBLIC_SITE_URL;
+    return u.startsWith("http") ? u : `https://${u}`;
+  }
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+    return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+};
+
+const baseUrl = getBaseUrl();
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tomatica.haisyam.dev"),
+  metadataBase: new URL(baseUrl),
   title: "Tomatica",
   description: "Platform Uji Validasi Model Prediktif Penyakit Tanaman Tomat, Evaluasi Dataset Citra Daun & Buah, dan Sensor Mikroklimat.",
   keywords: ["Tomatica", "Penyakit Tomat", "Expert Judgment", "Validasi Model", "Agroklimat", "Fitopatologi", "POPT Sukabumi"],
@@ -24,15 +40,32 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Tomatica",
     description: "Platform Uji Validasi Model Prediktif Penyakit Tanaman Tomat, Evaluasi Dataset Citra Daun & Buah, dan Sensor Mikroklimat.",
-    url: "https://tomatica.haisyam.dev",
+    url: baseUrl,
     siteName: "Tomatica",
     locale: "id_ID",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Tomatica - Validasi Model & Dataset Tanaman Tomat",
+        type: "image/png",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Tomatica",
     description: "Platform Uji Validasi Model Prediktif Penyakit Tanaman Tomat, Evaluasi Dataset Citra Daun & Buah, dan Sensor Mikroklimat.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Tomatica - Validasi Model & Dataset Tanaman Tomat",
+      },
+    ],
   },
 };
 
