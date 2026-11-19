@@ -1,0 +1,38 @@
+[
+  {
+    "id": "samarang_garut",
+    "zone": "Samarang, Garut (Dataran Tinggi)",
+    "period": "24 - 25 Juni 2026 (Fase Generatif / Pematangan)",
+    "totalRecords": 3204,
+    "tempRange": "22.5 - 38.7 °C (Rata-rata: 29.8 °C)",
+    "rhRange": "53.2 - 92.3 % (Rata-rata: 69.1 %)",
+    "rainLight": "Hujan: 0.0 mm/jam | Cahaya: 14,268 Lux",
+    "soilMoisture": "21.8 % (Kondisi Kering Terkendali)",
+    "sensorHealth": "Lengkap (Suhu, RH, Lux, Soil Moisture, pH, NPK, EC)",
+    "csvUrl": "https://tomatica.haisyam.dev/tomato-sensor-data/samarang_garut.csv"
+  },
+  {
+    "id": "gunungmanik_majalengka",
+    "zone": "Gunungmanik, Majalengka (Agroekologi 1)",
+    "period": "17 Februari 2026 (Fase Vegetatif Akhir)",
+    "totalRecords": 1837,
+    "tempRange": "20.6 - 39.7 °C (Rata-rata: 32.5 °C)",
+    "rhRange": "47.9 - 100.0 % (Rata-rata: 67.0 %)",
+    "rainLight": "Hujan: 0.0 mm/jam | Cahaya: 20,563 Lux",
+    "soilMoisture": "62.9 % (Kondisi Lembab Optimum)",
+    "sensorHealth": "Standar Mikroklimat (Suhu, RH, Lux, Lengas, Angin)",
+    "csvUrl": "https://tomatica.haisyam.dev/tomato-sensor-data/gunungmanik_majalengka.csv"
+  },
+  {
+    "id": "sangiang_majalengka",
+    "zone": "Sangiang, Majalengka (Agroekologi 2)",
+    "period": "02 Mei 2026 (Fase Pembungaan)",
+    "totalRecords": 155,
+    "tempRange": "23.1 - 32.1 °C (Rata-rata: 25.4 °C)",
+    "rhRange": "69.0 - 100.0 % (Rata-rata: 92.4 %)",
+    "rainLight": "Hujan: 0.0 mm/jam | Cahaya: 10,166 Lux",
+    "soilMoisture": "58.2 % (Kondisi Cukup Basah)",
+    "sensorHealth": "Standar Mikroklimat (Suhu, RH, Lux, Lengas, Angin)",
+    "csvUrl": "https://tomatica.haisyam.dev/tomato-sensor-data/sangiang_majalengka.csv"
+  }
+]

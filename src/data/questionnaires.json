@@ -1,0 +1,392 @@
+{
+  "sukabumi": [
+    {
+      "id": "section_c",
+      "name": "Bagian C",
+      "title": "C. Kesesuaian Rancangan Validasi Cross Zone",
+      "items": [
+        {
+          "no": 1,
+          "text": "Lokasi sumber dan lokasi target uji dijelaskan dengan jelas sehingga perbandingan lintas zona dapat ditelusuri."
+        },
+        {
+          "no": 2,
+          "text": "Pemilihan Lengkong dan Kalibunder relevan untuk menilai penerapan model pada kondisi lapang di Kabupaten Sukabumi."
+        },
+        {
+          "no": 3,
+          "text": "Perbedaan kondisi lapang yang mungkin memengaruhi gejala atau citra tanaman, seperti cuaca, kelembapan, fase tumbuh, dan praktik budidaya, telah dipertimbangkan."
+        },
+        {
+          "no": 4,
+          "text": "Prosedur pengambilan sampel di zona sumber dan zona target cukup sebanding untuk mendukung interpretasi hasil uji."
+        },
+        {
+          "no": 5,
+          "text": "Rancangan validasi membedakan penilaian kesesuaian diagnosis lapang dari pengukuran kinerja statistik model."
+        },
+        {
+          "no": 6,
+          "text": "Informasi varietas, umur atau fase tanaman, kondisi budidaya, serta riwayat perlakuan dicatat secukupnya untuk memahami perbedaan antar sampel."
+        }
+      ]
+    },
+    {
+      "id": "section_d",
+      "name": "Bagian D",
+      "title": "D. Kesesuaian Gejala dan Label Penyakit Tanaman Tomat",
+      "items": [
+        {
+          "no": 7,
+          "text": "Daftar kelas penyakit dan kelas sehat yang diuji relevan dengan masalah yang ditemukan pada tanaman tomat di wilayah tugas validator."
+        },
+        {
+          "no": 8,
+          "text": "Uraian gejala untuk setiap kelas cukup jelas untuk membedakan penyakit berdasarkan pengamatan lapang."
+        },
+        {
+          "no": 9,
+          "text": "Ciri visual pada daun atau buah yang digunakan untuk menetapkan label sesuai dengan gejala yang lazim dijumpai di lapangan."
+        },
+        {
+          "no": 10,
+          "text": "Prosedur penetapan label mempertimbangkan kemungkinan gejala yang mirip, serangan campuran, atau kerusakan nonpenyakit."
+        },
+        {
+          "no": 11,
+          "text": "Sampel berlabel sehat diperiksa untuk memastikan tidak menunjukkan gejala penyakit yang menjadi kelas uji."
+        },
+        {
+          "no": 12,
+          "text": "Kasus dengan gejala tidak khas atau diagnosis yang belum pasti dapat ditandai sebagai meragukan atau perlu pemeriksaan lanjutan."
+        },
+        {
+          "no": 13,
+          "text": "Label pada sampel lintas zona dapat ditelusuri ke lokasi, waktu pengamatan, bagian tanaman, dan catatan diagnosis."
+        }
+      ]
+    },
+    {
+      "id": "section_e",
+      "name": "Bagian E",
+      "title": "E. Kecukupan Bukti Citra dan Data Sensor",
+      "items": [
+        {
+          "no": 14,
+          "text": "Foto atau citra menampilkan bagian tanaman dan gejala yang diperlukan untuk penilaian POPT."
+        },
+        {
+          "no": 15,
+          "text": "Ketajaman, pencahayaan, jarak, dan sudut pengambilan citra memadai untuk mengenali gejala pada sampel."
+        },
+        {
+          "no": 16,
+          "text": "Data sensor mikroklimat yang disertakan memiliki informasi jenis sensor, satuan, lokasi, dan waktu pencatatan yang jelas."
+        },
+        {
+          "no": 17,
+          "text": "Konteks waktu dan lokasi citra serta sensor dijelaskan secara memadai untuk menafsirkan keterkaitan antar sumber data."
+        },
+        {
+          "no": 18,
+          "text": "Jika citra dan sensor tidak diambil secara berpasangan pada tanaman yang sama, keterbatasan tersebut dijelaskan dan cara penggunaan masing-masing modalitas dapat dipahami."
+        },
+        {
+          "no": 19,
+          "text": "Variasi mutu citra dan ketersediaan sensor di zona target mencerminkan kendala lapang yang mungkin ditemui saat penerapan model."
+        }
+      ]
+    },
+    {
+      "id": "section_f",
+      "name": "Bagian F",
+      "title": "F. Kelayakan Hasil Prediksi dan Penerapan di Lapangan",
+      "items": [
+        {
+          "no": 20,
+          "text": "Nama kelas dan hasil prediksi model disajikan dengan istilah yang dapat dipahami oleh petugas lapang."
+        },
+        {
+          "no": 21,
+          "text": "Tingkat keyakinan atau ketidakpastian model disajikan secara wajar dan tidak mendorong diagnosis pasti ketika buktinya terbatas."
+        },
+        {
+          "no": 22,
+          "text": "Hasil model menyediakan informasi yang cukup untuk membantu pemeriksaan lanjutan, seperti gejala utama atau bagian tanaman yang perlu diamati."
+        },
+        {
+          "no": 23,
+          "text": "Perbedaan hasil antara zona sumber dan zona target dapat dikenali dan ditinjau kembali menggunakan bukti lapang."
+        },
+        {
+          "no": 24,
+          "text": "Keluaran model dapat digunakan sebagai informasi pendukung pemantauan, dengan keputusan pengendalian tetap mempertimbangkan pemeriksaan POPT."
+        },
+        {
+          "no": 25,
+          "text": "Alur pencatatan kesalahan prediksi, kasus meragukan, dan umpan balik petugas lapang praktis untuk dilaksanakan."
+        }
+      ]
+    }
+  ],
+  "fitopatologi": [
+    {
+      "id": "section_c",
+      "name": "Bagian C",
+      "title": "C. Validitas Kelas dan Definisi Penyakit",
+      "items": [
+        {
+          "no": 1,
+          "text": "Daftar kelas penyakit dan kelas sehat sesuai dengan ruang lingkup penelitian dan dapat diperiksa secara fitopatologis."
+        },
+        {
+          "no": 2,
+          "text": "Definisi operasional setiap kelas menjelaskan gejala diagnostik secara cukup spesifik untuk membedakannya dari kelas lain."
+        },
+        {
+          "no": 3,
+          "text": "Pemilihan kelas penyakit relevan dengan penyakit yang berpotensi dijumpai pada tomat di lokasi uji."
+        },
+        {
+          "no": 4,
+          "text": "Pengelompokan penyakit daun, penyakit buah, dan kondisi sehat disusun secara konsisten dengan objek serta bukti yang dianalisis."
+        },
+        {
+          "no": 5,
+          "text": "Nama kelas menggunakan istilah penyakit atau gangguan tanaman yang tepat dan tidak menyamakan gejala dengan penyebab tanpa bukti."
+        },
+        {
+          "no": 6,
+          "text": "Batasan diagnosis berdasarkan citra saja dan kebutuhan pemeriksaan tambahan dijelaskan secara tepat."
+        }
+      ]
+    },
+    {
+      "id": "section_d",
+      "name": "Bagian D",
+      "title": "D. Kecukupan Gejala dan Diagnosis Banding",
+      "items": [
+        {
+          "no": 7,
+          "text": "Gejala yang ditampilkan pada sampel sesuai dengan deskripsi kelas penyakit yang menjadi label."
+        },
+        {
+          "no": 8,
+          "text": "Bukti citra memperlihatkan karakter gejala yang cukup untuk mendukung penilaian pada bagian tanaman yang terdampak."
+        },
+        {
+          "no": 9,
+          "text": "Protokol penilaian mempertimbangkan kemiripan gejala antarpenyakit dan gangguan fisiologis atau kerusakan noninfeksius."
+        },
+        {
+          "no": 10,
+          "text": "Protokol memberi ruang untuk mencatat infeksi campuran, gejala tidak khas, tingkat keparahan, atau diagnosis yang belum pasti."
+        },
+        {
+          "no": 11,
+          "text": "Sampel sehat telah diperiksa untuk memastikan tidak terdapat gejala penyakit yang termasuk dalam kelas uji."
+        },
+        {
+          "no": 12,
+          "text": "Informasi umur tanaman, varietas, bagian tanaman, fase pertumbuhan, dan riwayat perlakuan cukup untuk mendukung diagnosis."
+        },
+        {
+          "no": 13,
+          "text": "Kriteria untuk meminta pemeriksaan lanjutan atau uji laboratorium pada sampel yang meragukan dijelaskan dengan jelas."
+        }
+      ]
+    },
+    {
+      "id": "section_e",
+      "name": "Bagian E",
+      "title": "E. Ketepatan Label Referensi dan Bukti Sampel",
+      "items": [
+        {
+          "no": 14,
+          "text": "Label referensi pada setiap sampel dapat ditelusuri ke identitas sampel, lokasi, waktu, dan bagian tanaman yang diamati."
+        },
+        {
+          "no": 15,
+          "text": "Prosedur penetapan label mengutamakan pemeriksaan gejala oleh ahli sebelum label dibandingkan dengan prediksi model."
+        },
+        {
+          "no": 16,
+          "text": "Bukti citra dan catatan lapang memadai untuk mendukung label referensi yang diberikan."
+        },
+        {
+          "no": 17,
+          "text": "Label yang tidak didukung bukti cukup dapat ditandai sebagai belum pasti, dikeluarkan dari analisis, atau diperiksa ulang."
+        },
+        {
+          "no": 18,
+          "text": "Konsistensi label antarpenilai diperiksa atau didokumentasikan bila lebih dari satu ahli terlibat."
+        },
+        {
+          "no": 19,
+          "text": "Perbedaan antara label dataset, diagnosis ahli, dan prediksi sistem dicatat secara transparan."
+        }
+      ]
+    },
+    {
+      "id": "section_f",
+      "name": "Bagian F",
+      "title": "F. Interpretasi Fitopatologis pada Uji Cross Zone",
+      "items": [
+        {
+          "no": 20,
+          "text": "Lokasi sumber dan lokasi target dijelaskan sehingga asal setiap sampel dapat ditelusuri."
+        },
+        {
+          "no": 21,
+          "text": "Variasi kondisi lingkungan dan budidaya antarwilayah diperlakukan sebagai konteks yang dapat memengaruhi gejala dan tampilan citra."
+        },
+        {
+          "no": 22,
+          "text": "Perubahan gejala atau tingkat keparahan antarwilayah tidak langsung dianggap sebagai perubahan penyebab penyakit tanpa bukti yang cukup."
+        },
+        {
+          "no": 23,
+          "text": "Hasil model pada zona target ditafsirkan dengan mempertimbangkan diagnosis ahli dan mutu bukti, bukan hanya skor prediksi."
+        },
+        {
+          "no": 24,
+          "text": "Kasus salah prediksi, gejala ambigu, dan kemungkinan penyakit di luar kelas model ditandai untuk evaluasi lanjutan."
+        },
+        {
+          "no": 25,
+          "text": "Keluaran model disajikan sebagai dukungan pemeriksaan dan pemantauan, bukan pengganti diagnosis atau rekomendasi pengendalian oleh ahli."
+        }
+      ]
+    }
+  ],
+  "agroklimat": [
+    {
+      "id": "section_c",
+      "name": "Bagian C",
+      "title": "C. Kesesuaian Variabel Agroklimat",
+      "items": [
+        {
+          "no": 1,
+          "text": "Variabel agroklimat yang dipilih relevan untuk menggambarkan kondisi lingkungan tanaman tomat di lokasi penelitian."
+        },
+        {
+          "no": 2,
+          "text": "Variabel yang dicatat, seperti suhu, kelembapan relatif, curah hujan, intensitas cahaya, atau kelembapan tanah, sesuai dengan tujuan analisis yang dijelaskan peneliti."
+        },
+        {
+          "no": 3,
+          "text": "Definisi, satuan, rentang, dan cara peringkasan setiap variabel dijelaskan secara jelas dan konsisten."
+        },
+        {
+          "no": 4,
+          "text": "Setiap variabel memiliki alasan penggunaan yang dapat dijelaskan berdasarkan proses budidaya atau kondisi lingkungan tanaman."
+        },
+        {
+          "no": 5,
+          "text": "Pemilihan variabel mencakup informasi yang cukup untuk menggambarkan perbedaan agroklimat antarwilayah atau periode pengamatan."
+        },
+        {
+          "no": 6,
+          "text": "Batasan penggunaan data agroklimat untuk menjelaskan risiko penyakit dibedakan dengan jelas dari diagnosis penyakit tanaman."
+        }
+      ]
+    },
+    {
+      "id": "section_d",
+      "name": "Bagian D",
+      "title": "D. Mutu Pengukuran Sensor dan Pengelolaan Data",
+      "items": [
+        {
+          "no": 7,
+          "text": "Jenis sensor dan spesifikasi pengukuran sesuai dengan variabel agroklimat yang dilaporkan."
+        },
+        {
+          "no": 8,
+          "text": "Lokasi, ketinggian, pelindung, dan posisi sensor dijelaskan sehingga keterwakilan pengukurannya dapat dinilai."
+        },
+        {
+          "no": 9,
+          "text": "Informasi kalibrasi, pemeriksaan sensor, atau prosedur kendali mutu disediakan secara memadai."
+        },
+        {
+          "no": 10,
+          "text": "Waktu pencatatan dan interval pengukuran sesuai dengan tujuan analisis serta diterapkan secara konsisten."
+        },
+        {
+          "no": 11,
+          "text": "Data hilang, nilai ekstrem, gangguan sensor, dan perubahan perangkat ditangani dengan prosedur yang jelas."
+        },
+        {
+          "no": 12,
+          "text": "Metadata pengukuran mencakup lokasi, tanggal, waktu, satuan, identitas sensor, dan kondisi pengamatan yang diperlukan."
+        },
+        {
+          "no": 13,
+          "text": "Prosedur pengukuran di zona sumber dan zona target cukup sebanding untuk mendukung analisis lintas zona."
+        }
+      ]
+    },
+    {
+      "id": "section_e",
+      "name": "Bagian E",
+      "title": "E. Keterwakilan Kondisi Agroklimat Lintas Zona",
+      "items": [
+        {
+          "no": 14,
+          "text": "Zona sumber dan zona target didefinisikan secara jelas berdasarkan lokasi dan periode data yang dianalisis."
+        },
+        {
+          "no": 15,
+          "text": "Periode pengamatan cukup mewakili kondisi agroklimat yang menjadi fokus penelitian di setiap zona."
+        },
+        {
+          "no": 16,
+          "text": "Perbandingan antarwilayah mempertimbangkan musim, waktu pengamatan, elevasi, serta praktik budidaya bila informasi tersedia."
+        },
+        {
+          "no": 17,
+          "text": "Rentang dan variasi data di setiap zona ditampilkan sehingga perbedaan maupun tumpang tindih kondisi dapat diperiksa."
+        },
+        {
+          "no": 18,
+          "text": "Penyetaraan format, satuan, interval, dan ringkasan data antarwilayah dijelaskan secara konsisten."
+        },
+        {
+          "no": 19,
+          "text": "Keterbatasan cakupan lokasi, musim, atau jumlah sensor dipertimbangkan saat menafsirkan kemampuan model berpindah zona."
+        }
+      ]
+    },
+    {
+      "id": "section_f",
+      "name": "Bagian F",
+      "title": "F. Interpretasi Agroklimat dalam Model dan DSS",
+      "items": [
+        {
+          "no": 20,
+          "text": "Cara data agroklimat digunakan oleh model dijelaskan, termasuk apakah sebagai masukan langsung, konteks zona, atau ringkasan periode."
+        },
+        {
+          "no": 21,
+          "text": "Jika citra dan sensor tidak berpasangan pada tanaman atau waktu yang sama, interpretasi hasil tidak mengklaim hubungan sampel-spesifik yang tidak didukung data."
+        },
+        {
+          "no": 22,
+          "text": "Hubungan antara kondisi agroklimat dan keluaran prediksi dijelaskan sebagai asosiasi atau dukungan risiko sesuai kekuatan bukti yang tersedia."
+        },
+        {
+          "no": 23,
+          "text": "Keluaran model memperlihatkan konteks zona, periode, dan kualitas data sensor yang diperlukan untuk memahami hasil prediksi."
+        },
+        {
+          "no": 24,
+          "text": "Ketidakpastian dan keterbatasan data agroklimat disampaikan saat model memberi hasil pada kondisi yang berbeda dari data pelatihan."
+        },
+        {
+          "no": 25,
+          "text": "Informasi agroklimat pada DSS mendukung pemantauan tanpa memberi ambang risiko atau rekomendasi pengendalian yang belum teruji."
+        }
+      ]
+    }
+  ]
+}
