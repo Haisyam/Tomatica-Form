@@ -372,7 +372,7 @@ export default function AdminPage() {
               </form>
             </CardContent>
             <CardFooter className="pt-0 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-400">
-              <span>Default: admin / tomatica2026</span>
+              <span>Akses Khusus Pengelola</span>
               <Link href="/" className="text-emerald-700 font-semibold hover:underline flex items-center gap-1">
                 <ArrowLeft className="size-3.5" />
                 <span>Ke Form Validator</span>
