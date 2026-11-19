@@ -17,6 +17,9 @@ export async function GET(req: NextRequest) {
     if (part !== "all") {
       whereClauses.push("part = ?");
       args.push(part);
+    } else {
+      // Katalog foto citra daun & buah hanya memuat leaf dan fruit (mengecualikan rekaman data sensor CSV)
+      whereClauses.push("part IN ('leaf', 'fruit')");
     }
     if (disease !== "all") {
       whereClauses.push("disease = ?");

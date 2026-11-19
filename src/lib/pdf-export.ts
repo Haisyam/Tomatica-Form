@@ -32,7 +32,7 @@ function drawVectorCheckmark(
   cx: number,
   cy: number,
   size: number = 1.3,
-  color: [number, number, number] = [16, 120, 60]
+  color: [number, number, number] = [0, 0, 0]
 ) {
   doc.saveGraphicsState();
   doc.setDrawColor(color[0], color[1], color[2]);
@@ -78,7 +78,8 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
     subtitleRole = "Penilaian Pakar Agroklimatologi & Dinamika Sensor Mikroklimat";
   }
 
-  // 1. KOP SURAT / HEADER RESMI
+  // 1. KOP SURAT / HEADER RESMI (Hitam Monokrom)
+  doc.setTextColor(0, 0, 0);
   doc.setFont("times", "bold");
   doc.setFontSize(13);
   doc.text("KUESIONER EXPERT JUDGMENT", pageWidth / 2, 18, { align: "center" });
@@ -96,7 +97,7 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
   doc.text(subtitleRole, pageWidth / 2, 29, { align: "center" });
 
   // Double border line separator (standar dokumen formal / Word)
-  doc.setDrawColor(40, 40, 40);
+  doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.8);
   doc.line(margin, 32, pageWidth - margin, 32);
   doc.setLineWidth(0.25);
@@ -112,7 +113,7 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
         {
           content: "A. IDENTITAS DAN KEPAKARAN VALIDATOR",
           colSpan: 2,
-          styles: { fontStyle: "bold", fillColor: [240, 240, 240], textColor: [20, 20, 20] },
+          styles: { fontStyle: "bold", fillColor: [240, 240, 240], textColor: [0, 0, 0] },
         },
       ],
     ],
@@ -129,9 +130,9 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
       font: "times",
       fontSize: 9.5,
       cellPadding: 2,
-      lineColor: [180, 180, 180],
+      lineColor: [200, 200, 200],
       lineWidth: 0.15,
-      textColor: [30, 30, 30],
+      textColor: [0, 0, 0],
     },
     columnStyles: {
       0: { cellWidth: 55, fontStyle: "bold" },
@@ -150,7 +151,7 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
         {
           content: "B. PETUNJUK DAN SKALA PENILAIAN (LIKERT 1–5 & TD)",
           colSpan: 2,
-          styles: { fontStyle: "bold", fillColor: [240, 240, 240], textColor: [20, 20, 20] },
+          styles: { fontStyle: "bold", fillColor: [240, 240, 240], textColor: [0, 0, 0] },
         },
       ],
     ],
@@ -172,9 +173,9 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
       font: "times",
       fontSize: 9,
       cellPadding: 2,
-      lineColor: [180, 180, 180],
+      lineColor: [200, 200, 200],
       lineWidth: 0.15,
-      textColor: [40, 40, 40],
+      textColor: [0, 0, 0],
     },
     didDrawCell: (data) => {
       if (data.section === "body" && data.row.index === 1 && data.column.index === 0) {
@@ -182,9 +183,9 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
         const cy = data.cell.y + data.cell.height / 2;
         doc.setFont("times", "bold");
         doc.setFontSize(10);
-        doc.setTextColor(50, 50, 50);
+        doc.setTextColor(0, 0, 0);
         doc.text("[", cx - 3.8, cy + 1, { align: "center" });
-        drawVectorCheckmark(doc, cx, cy - 0.2, 1.25, [16, 120, 60]);
+        drawVectorCheckmark(doc, cx, cy - 0.2, 1.25, [0, 0, 0]);
         doc.text("]", cx + 3.8, cy + 1, { align: "center" });
       }
     },
@@ -238,8 +239,8 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
             content: sec.title.toUpperCase(),
             colSpan: 8,
             styles: {
-              fillColor: [230, 235, 230],
-              textColor: [10, 40, 20],
+              fillColor: [240, 240, 240],
+              textColor: [0, 0, 0],
               fontStyle: "bold",
               fontSize: 9.5,
             },
@@ -253,17 +254,17 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
         font: "times",
         fontSize: 8.5,
         cellPadding: 1.8,
-        lineColor: [160, 160, 160],
+        lineColor: [200, 200, 200],
         lineWidth: 0.15,
-        textColor: [20, 20, 20],
+        textColor: [0, 0, 0],
         valign: "middle",
       },
       headStyles: {
         font: "times",
         fontStyle: "bold",
         fontSize: 9,
-        fillColor: [240, 240, 240],
-        textColor: [20, 20, 20],
+        fillColor: [245, 245, 245],
+        textColor: [0, 0, 0],
         halign: "center",
       },
       columnStyles: {
@@ -285,7 +286,7 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
         if (data.row.index === tableRows.length - 1 && sectionNote) {
           if (data.column.index === 1) {
             data.cell.styles.fontStyle = "italic";
-            data.cell.styles.textColor = [60, 60, 60];
+            data.cell.styles.textColor = [0, 0, 0];
           }
         }
       },
@@ -293,7 +294,7 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
         if (data.section === "body" && data.column.index >= 2 && data.cell.raw === "4") {
           const cx = data.cell.x + data.cell.width / 2;
           const cy = data.cell.y + data.cell.height / 2;
-          drawVectorCheckmark(doc, cx, cy, 1.3, [16, 120, 60]);
+          drawVectorCheckmark(doc, cx, cy, 1.3, [0, 0, 0]);
         }
       },
     });
@@ -352,7 +353,7 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
         {
           content: "G. RINGKASAN VALIDASI SAMPEL CITRA & REKAMAN SENSOR",
           colSpan: 2,
-          styles: { fontStyle: "bold", fillColor: [240, 240, 240], textColor: [20, 20, 20] },
+          styles: { fontStyle: "bold", fillColor: [240, 240, 240], textColor: [0, 0, 0] },
         },
       ],
     ],
@@ -362,9 +363,9 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
       font: "times",
       fontSize: 8.5,
       cellPadding: 2,
-      lineColor: [180, 180, 180],
+      lineColor: [200, 200, 200],
       lineWidth: 0.15,
-      textColor: [30, 30, 30],
+      textColor: [0, 0, 0],
     },
     columnStyles: {
       0: { cellWidth: 50, fontStyle: "bold" },
@@ -429,7 +430,7 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
         font: isChosen ? "ZapfDingbats" : "times",
         fontSize: 11,
         halign: "center",
-        textColor: [16, 120, 60],
+        textColor: [0, 0, 0],
         cellWidth: 10,
       },
     });
@@ -452,7 +453,7 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
         {
           content: "H. REKAPITULASI DAN KEPUTUSAN REKOMENDASI VALIDATOR",
           colSpan: 3,
-          styles: { fontStyle: "bold", fillColor: [240, 240, 240], textColor: [20, 20, 20] },
+          styles: { fontStyle: "bold", fillColor: [240, 240, 240], textColor: [0, 0, 0] },
         },
       ],
     ],
@@ -462,9 +463,9 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
       font: "times",
       fontSize: 9,
       cellPadding: 2.2,
-      lineColor: [180, 180, 180],
+      lineColor: [200, 200, 200],
       lineWidth: 0.15,
-      textColor: [30, 30, 30],
+      textColor: [0, 0, 0],
     },
     columnStyles: {
       0: { cellWidth: 50 },
@@ -481,12 +482,12 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
         const cx = data.cell.x + data.cell.width / 2;
         const cy = data.cell.y + data.cell.height / 2;
         doc.saveGraphicsState();
-        doc.setDrawColor(90, 90, 90);
+        doc.setDrawColor(0, 0, 0);
         doc.setLineWidth(0.35);
         doc.rect(cx - 2.6, cy - 2.6, 5.2, 5.2);
         const rawVal = typeof data.cell.raw === "object" ? (data.cell.raw as any)?.content : data.cell.raw;
         if (rawVal === "4") {
-          drawVectorCheckmark(doc, cx, cy - 0.2, 1.3, [16, 120, 60]);
+          drawVectorCheckmark(doc, cx, cy - 0.2, 1.3, [0, 0, 0]);
         }
         doc.restoreGraphicsState();
       }
@@ -517,6 +518,7 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
     sigLocation = "Jawa Barat";
   }
 
+  doc.setTextColor(0, 0, 0);
   doc.setFont("times", "normal");
   doc.setFontSize(10);
   doc.text(`${sigLocation}, ${todayStr}`, sigX + sigWidth / 2, currentY, { align: "center" });
@@ -526,7 +528,7 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
   currentY += 28;
 
   // Garis bawah tanda tangan
-  doc.setDrawColor(30, 30, 30);
+  doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.3);
   doc.line(sigX + 5, currentY, sigX + sigWidth - 5, currentY);
 
@@ -544,13 +546,13 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
     align: "center",
   });
 
-  // 8. NOMOR HALAMAN DI FOOTER
+  // 8. NOMOR HALAMAN DI FOOTER (Hitam Monokrom)
   const totalPages = (doc.internal as any).getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
     doc.setFont("times", "italic");
     doc.setFontSize(8);
-    doc.setTextColor(120, 120, 120);
+    doc.setTextColor(0, 0, 0);
     doc.text(
       `Dokumen Hasil Penilaian Validasi Cross-Zone Model Tomatica • Halaman ${i} dari ${totalPages}`,
       pageWidth / 2,

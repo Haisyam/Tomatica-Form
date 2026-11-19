@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
       GROUP BY section_id;
     `);
 
-    // 3. Fetch all Image Corrections with sample metadata
+    // 3. Fetch all Image Corrections with sample metadata (HANYA citra foto penyakit: leaf & fruit)
     const correctionsRes = await db.execute(`
       SELECT 
         sv.id as correction_id,
@@ -51,6 +51,28 @@ export async function GET(req: NextRequest) {
       FROM sample_validations sv
       JOIN samples s ON sv.sample_id = s.id
       LEFT JOIN validators v ON sv.validator_id = v.id
+      WHERE s.part != 'sensor'
+      ORDER BY sv.created_at DESC;
+    `);
+
+    // 3b. Fetch Evaluasi Sensor Mikroklimat secara terpisah
+    const sensorReviewsRes = await db.execute(`
+      SELECT 
+        sv.id as review_id,
+        sv.sample_id,
+        sv.expert_diagnosis as status,
+        sv.symptom_notes as notes,
+        sv.created_at as reviewed_at,
+        s.disease_label as station_name,
+        s.location,
+        s.filename,
+        s.image_url as csv_url,
+        v.name as validator_name,
+        v.role as validator_role
+      FROM sample_validations sv
+      JOIN samples s ON sv.sample_id = s.id
+      LEFT JOIN validators v ON sv.validator_id = v.id
+      WHERE s.part = 'sensor'
       ORDER BY sv.created_at DESC;
     `);
 
@@ -78,6 +100,7 @@ export async function GET(req: NextRequest) {
         bySection: sectionLikertRes.rows || [],
       },
       corrections: correctionsRes.rows,
+      sensorReviews: sensorReviewsRes.rows,
       samplesOverview: samplesCountRes.rows[0] || {},
       recommendationSummary: recSummaryRes.rows || [],
     });

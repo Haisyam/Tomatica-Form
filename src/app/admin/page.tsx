@@ -44,7 +44,7 @@ export default function AdminPage() {
   // Dashboard Data State
   const [statsData, setStatsData] = useState<any>(null);
   const [isLoadingStats, setIsLoadingStats] = useState(false);
-  const [activeAdminTab, setActiveAdminTab] = useState<"overview" | "validators" | "corrections">("overview");
+  const [activeAdminTab, setActiveAdminTab] = useState<"overview" | "validators" | "corrections" | "sensors">("overview");
 
   // Search & Filter for corrections
   const [correctionSearch, setCorrectionSearch] = useState("");
@@ -553,6 +553,16 @@ export default function AdminPage() {
           >
             ⚠️ Rekap Koreksi Citra ({statsData?.corrections?.length || 0})
           </button>
+          <button
+            onClick={() => setActiveAdminTab("sensors")}
+            className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition ${
+              activeAdminTab === "sensors"
+                ? "bg-emerald-600 text-white shadow-xs"
+                : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            🌡️ Evaluasi Sensor ({statsData?.sensorReviews?.length || 0})
+          </button>
         </div>
 
         {/* ================= SUB-TAB 1: OVERVIEW ================= */}
@@ -871,6 +881,67 @@ export default function AdminPage() {
                     </div>
                   </Card>
                 ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ================= SUB-TAB 4: REKAP EVALUASI SENSOR MIKROKLIMAT ================= */}
+        {activeAdminTab === "sensors" && (
+          <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <b>Rekap Evaluasi Mikroklimat:</b> Penilaian para pakar terhadap kelayakan rekaman stasiun sensor IoT di Samarang (Garut), Gunungmanik (Majalengka), dan Sangiang (Majalengka).
+              </div>
+              <span className="text-[11px] font-bold text-emerald-800 shrink-0">
+                Total Review: {statsData?.sensorReviews?.length || 0}
+              </span>
+            </div>
+
+            {(!statsData?.sensorReviews || statsData.sensorReviews.length === 0) ? (
+              <div className="p-8 bg-white rounded-2xl border border-dashed border-slate-200 text-center text-xs text-slate-500">
+                Belum ada evaluasi sensor mikroklimat yang tersimpan.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                {statsData.sensorReviews.map((rev: any) => {
+                  const isMemadai = rev.status === "Memadai" || rev.status === "memadai";
+                  return (
+                    <Card key={rev.review_id} className="rounded-2xl border-slate-200 shadow-xs overflow-hidden bg-white">
+                      <CardHeader className="p-3.5 pb-2 border-b border-slate-100 flex flex-row items-center justify-between">
+                        <div>
+                          <CardTitle className="text-xs font-bold text-slate-900">{rev.station_name || rev.sample_id}</CardTitle>
+                          <span className="text-[10px] text-slate-400 capitalize">{rev.location}</span>
+                        </div>
+                        <Badge className={`text-[10px] border-0 ${isMemadai ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-900"}`}>
+                          {isMemadai ? "✓ Data Wajar" : "⚠ Perlu Cek"}
+                        </Badge>
+                      </CardHeader>
+                      <CardContent className="p-3.5 space-y-2">
+                        <div>
+                          <span className="text-[10px] text-slate-400 block font-medium">Catatan Pakar:</span>
+                          <p className="text-xs text-slate-700 bg-slate-50 p-2 rounded-xl border border-slate-100 mt-1 italic">
+                            {rev.notes ? `"${rev.notes}"` : "Tidak ada catatan khusus (data dinilai normal)."}
+                          </p>
+                        </div>
+                        <div className="pt-2 flex items-center justify-between text-[11px] border-t border-slate-100">
+                          <span className="text-slate-500 truncate max-w-[150px]">
+                            Validator: <b>{rev.validator_name || "Validator"}</b>
+                          </span>
+                          <a
+                            href={rev.csv_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-emerald-700 hover:text-emerald-800 font-semibold inline-flex items-center gap-1 text-[11px] underline"
+                          >
+                            <span>Unduh CSV</span>
+                            <Download className="size-3" />
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </div>

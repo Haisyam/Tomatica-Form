@@ -131,6 +131,8 @@ export default function MobileFormApp() {
   const [finalNotes, setFinalNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [submittedValidatorName, setSubmittedValidatorName] = useState("");
 
   // Status Auto-save
   const [isOnline, setIsOnline] = useState(true);
@@ -468,26 +470,46 @@ export default function MobileFormApp() {
 
       const result = await res.json();
       if (res.ok) {
+        const submittedName = validatorData.nama || "Validator";
+        setSubmittedValidatorName(submittedName);
         setSubmitSuccess(true);
+
+        // 1. Bersihkan draf lokal dari localStorage
         try {
           localStorage.removeItem(DRAFT_KEY);
           setLastSaved(null);
+          setDraftRestored(false);
         } catch (e) {}
 
-        // Otomatis buat dan unduh file PDF hasil kuesioner format Word dengan kolom TTD ahli
-        try {
-          downloadValidationPdf({
-            validator: { ...validatorData, role: validatorRole },
-            sections: currentLikertSections,
-            likertAnswers,
-            likertNotes,
-            corrections,
-            sensorReviews,
-            finalRecommendation: { decision: finalDecision, comments: finalNotes },
-          });
-        } catch (pdfErr) {
-          console.error("Gagal generate PDF:", pdfErr);
-        }
+        // 2. Reset seluruh data form menjadi kosong kembali (fresh state)
+        setValidatorData({
+          ...INITIAL_VALIDATOR,
+          role: validatorRole,
+          roleLabel:
+            validatorRole === "fitopatologi"
+              ? "Pakar Fitopatologi"
+              : validatorRole === "agroklimat"
+              ? "Pakar Agroklimat"
+              : "POPT Sukabumi",
+        });
+        setLikertAnswers({});
+        setLikertNotes({});
+        setCorrections({});
+        setSensorReviews({
+          samarang_garut: { status: "memadai", notes: "" },
+          gunungmanik_majalengka: { status: "memadai", notes: "" },
+          sangiang_majalengka: { status: "memadai", notes: "" },
+        });
+        setFinalDecision("layak");
+        setFinalNotes("");
+        setActiveLikertSection("section_c");
+
+        // 3. Pindahkan navigasi ke Tab 1 (Profil) & scroll ke atas
+        setActiveTab("profile");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        // 4. Tampilkan dialog alert sukses (tanpa otomatis download PDF)
+        setShowSuccessModal(true);
       } else {
         alert("Gagal menyimpan: " + (result.error || "Terjadi kesalahan"));
       }
@@ -1258,28 +1280,6 @@ export default function MobileFormApp() {
         {/* ================= TAB 4: REKOMENDASI VALIDATOR ================= */}
         {activeTab === "recap" && (
           <div className="space-y-3.5 animate-in fade-in duration-150">
-            {submitSuccess && (
-              <div className="bg-emerald-600 text-white p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-md">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="size-6 shrink-0 text-white" />
-                  <div className="text-xs">
-                    <p className="font-bold text-sm">Jawaban Berhasil Disimpan & PDF Telah Dibuat!</p>
-                    <p className="text-emerald-100">
-                      Dokumen hasil kuesioner resmi (format Word/PDF + kolom TTD ahli) otomatis diunduh ke perangkat Anda.
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  onClick={handleDownloadPDF}
-                  className="bg-white text-emerald-900 hover:bg-emerald-50 font-bold text-xs rounded-xl shadow-xs shrink-0 flex items-center gap-1.5 h-9"
-                >
-                  <FileText className="size-3.5 text-emerald-600" />
-                  <span>Download Ulang PDF</span>
-                </Button>
-              </div>
-            )}
-
             {likertStats.filledTotal < 25 && (
               <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-2xs">
                 <div className="flex items-center gap-2">
@@ -1375,7 +1375,7 @@ export default function MobileFormApp() {
                     className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-2xs flex items-center justify-center gap-1.5"
                   >
                     {isSubmitting ? (
-                      <span>Menyimpan & Buat PDF...</span>
+                      <span>Mengirim Jawaban...</span>
                     ) : (
                       <>
                         <span>Kirim Jawaban</span>
@@ -1529,6 +1529,29 @@ export default function MobileFormApp() {
               </div>
             );
           })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* MODAL ALERT SUKSES PENGIRIMAN */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent showCloseButton={false} className="max-w-md p-6 rounded-3xl bg-white border border-slate-200 shadow-2xl text-center">
+          <div className="size-16 rounded-3xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-3.5 shadow-md shadow-emerald-500/20">
+            <CheckCircle2 className="size-9 text-emerald-600" />
+          </div>
+          <DialogTitle className="text-lg font-bold text-slate-900">
+            Penilaian Berhasil Dikirim!
+          </DialogTitle>
+          <DialogDescription className="text-xs text-slate-600 mt-2 leading-relaxed">
+            Terima kasih kepada <b>{submittedValidatorName || "Validator"}</b>. Seluruh data identitas, evaluasi 25 butir kuesioner, catatan sampel, dan rekomendasi Anda telah berhasil tersimpan dengan aman ke dalam sistem database.
+          </DialogDescription>
+          <div className="mt-5">
+            <Button
+              onClick={() => setShowSuccessModal(false)}
+              className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-10 rounded-xl shadow-xs"
+            >
+              OK, Selesai
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
