@@ -276,8 +276,10 @@ export default function MobileFormApp() {
   };
 
   // Load Samples (18 per page = 6 neat rows of 3 columns)
+  // Hanya di-load jika bukan pakar agroklimat (pakar agroklimat hanya memeriksa sensor)
   useEffect(() => {
     async function loadSamples() {
+      if (validatorRole === "agroklimat") return;
       setIsLoadingSamples(true);
       try {
         const params = new URLSearchParams({
@@ -292,7 +294,7 @@ export default function MobileFormApp() {
         if (data.samples) {
           setSamples(data.samples);
           setTotalPages(data.totalPages || 1);
-          setTotalSamplesCount(data.total || 2888);
+          setTotalSamplesCount(data.total || 2853);
         }
       } catch (e) {
         console.error("Error loading samples:", e);
@@ -300,10 +302,10 @@ export default function MobileFormApp() {
         setIsLoadingSamples(false);
       }
     }
-    if (activeTab === "dataset") {
+    if (activeTab === "dataset" && validatorRole !== "agroklimat") {
       loadSamples();
     }
-  }, [filterPart, filterDisease, samplePage, activeTab]);
+  }, [filterPart, filterDisease, samplePage, activeTab, validatorRole]);
 
   const handleScoreChange = (qNo: number, score: string) => {
     setLikertAnswers((prev) => ({ ...prev, [qNo]: score }));
@@ -427,24 +429,29 @@ export default function MobileFormApp() {
 
     setIsSubmitting(true);
     try {
-      const sampleValidationPayload = {
-        ...corrections,
-        samarang_garut: {
-          isCorrected: true,
-          correctDisease: sensorReviews.samarang_garut?.status === "memadai" ? "Memadai" : "Perlu Cek",
-          notes: sensorReviews.samarang_garut?.notes || "",
-        },
-        gunungmanik_majalengka: {
-          isCorrected: true,
-          correctDisease: sensorReviews.gunungmanik_majalengka?.status === "memadai" ? "Memadai" : "Perlu Cek",
-          notes: sensorReviews.gunungmanik_majalengka?.notes || "",
-        },
-        sangiang_majalengka: {
-          isCorrected: true,
-          correctDisease: sensorReviews.sangiang_majalengka?.status === "memadai" ? "Memadai" : "Perlu Cek",
-          notes: sensorReviews.sangiang_majalengka?.notes || "",
-        },
-      };
+      let sampleValidationPayload: any = {};
+      if (validatorRole === "agroklimat") {
+        sampleValidationPayload = {
+          samarang_garut: {
+            isCorrected: true,
+            correctDisease: sensorReviews.samarang_garut?.status === "memadai" ? "Memadai" : "Perlu Cek",
+            notes: sensorReviews.samarang_garut?.notes || "",
+          },
+          gunungmanik_majalengka: {
+            isCorrected: true,
+            correctDisease: sensorReviews.gunungmanik_majalengka?.status === "memadai" ? "Memadai" : "Perlu Cek",
+            notes: sensorReviews.gunungmanik_majalengka?.notes || "",
+          },
+          sangiang_majalengka: {
+            isCorrected: true,
+            correctDisease: sensorReviews.sangiang_majalengka?.status === "memadai" ? "Memadai" : "Perlu Cek",
+            notes: sensorReviews.sangiang_majalengka?.notes || "",
+          },
+        };
+      } else {
+        // POPT Sukabumi dan Ahli Penyakit Tanaman hanya mereview sampel foto daun/buah
+        sampleValidationPayload = { ...corrections };
+      }
 
       const payload = {
         validator: {
@@ -522,13 +529,20 @@ export default function MobileFormApp() {
 
   const handleDownloadPDF = () => {
     try {
+      const isAgro = validatorRole === "agroklimat";
       downloadValidationPdf({
         validator: { ...validatorData, role: validatorRole },
         sections: currentLikertSections,
         likertAnswers,
         likertNotes,
-        corrections,
-        sensorReviews,
+        corrections: isAgro ? {} : corrections,
+        sensorReviews: isAgro
+          ? sensorReviews
+          : {
+              samarang_garut: { status: "memadai", notes: "" },
+              gunungmanik_majalengka: { status: "memadai", notes: "" },
+              sangiang_majalengka: { status: "memadai", notes: "" },
+            },
         finalRecommendation: { decision: finalDecision, comments: finalNotes },
       });
     } catch (e) {
@@ -557,19 +571,25 @@ export default function MobileFormApp() {
 
   if (!isMounted) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <div className="size-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-2xl shadow-md mb-3 animate-pulse">
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4" suppressHydrationWarning>
+        <div className="size-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-2xl shadow-md mb-3 animate-pulse" suppressHydrationWarning>
           🍅
         </div>
-        <p className="text-xs font-semibold text-slate-500">Memuat Form Tomatica...</p>
+        <p className="text-xs font-semibold text-slate-500" suppressHydrationWarning>Memuat Form Tomatica...</p>
       </div>
     );
   }
 
+  const isAgroklimat = validatorRole === "agroklimat";
+
   const TABS = [
     { id: "profile", label: "1. Profil", icon: User },
-    { id: "likert", label: "2. Kuesioner", icon: ClipboardList },
-    { id: "dataset", label: "3. Cek Foto & Data", icon: Leaf },
+    {
+      id: "dataset",
+      label: isAgroklimat ? "2. Cek Sensor" : "2. Cek Foto",
+      icon: isAgroklimat ? Thermometer : Leaf,
+    },
+    { id: "likert", label: "3. Kuesioner", icon: ClipboardList },
     { id: "recap", label: "4. Rekomendasi", icon: Send },
   ];
 
@@ -742,12 +762,16 @@ export default function MobileFormApp() {
               <CardFooter className="p-4 pt-0 border-t-0">
                 <Button
                   onClick={() => {
-                    setActiveTab("likert");
+                    setActiveTab("dataset");
                     window.scrollTo({ top: 0, behavior: "smooth" });
                   }}
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs h-10 rounded-xl shadow-2xs flex items-center justify-center gap-1.5"
                 >
-                  <span>Mulai Isi Kuesioner (Langkah 2)</span>
+                  <span>
+                    {isAgroklimat
+                      ? "Lanjut ke Cek Sensor (Langkah 2)"
+                      : "Lanjut ke Cek Foto Citra (Langkah 2)"}
+                  </span>
                   <ChevronRight className="size-4" />
                 </Button>
               </CardFooter>
@@ -755,230 +779,23 @@ export default function MobileFormApp() {
           </div>
         )}
 
-        {/* ================= TAB 2: KUESIONER LIKERT ================= */}
-        {activeTab === "likert" && (() => {
-          const sectionIndex = currentLikertSections.findIndex((s: any) => s.id === activeLikertSection);
-          const currentIdx = sectionIndex !== -1 ? sectionIndex : 0;
-          const sec = currentLikertSections[currentIdx];
-
-          const handleNextSection = () => {
-            if (currentIdx < currentLikertSections.length - 1) {
-              setActiveLikertSection(currentLikertSections[currentIdx + 1].id);
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            } else {
-              setActiveTab("dataset");
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }
-          };
-
-          const handlePrevSection = () => {
-            if (currentIdx > 0) {
-              setActiveLikertSection(currentLikertSections[currentIdx - 1].id);
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            } else {
-              setActiveTab("profile");
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }
-          };
-
-          return (
-            <div className="space-y-3.5 animate-in fade-in duration-150">
-              {/* Petunjuk Skala Nilai 1-5 & TD (Rapi & Sejajar) */}
-              <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3 shadow-2xs">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-bold text-emerald-950 flex items-center gap-1.5">
-                    <span className="size-2 rounded-full bg-emerald-600 inline-block"></span>
-                    Panduan Pilihan Nilai:
-                  </span>
-                  <span className="text-[10px] font-medium text-emerald-700">Skala 1 – 5 & TD</span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
-                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-white/90 border border-emerald-100 shadow-2xs">
-                    <span className="size-5 rounded-lg bg-slate-100 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0 border border-slate-200">
-                      1
-                    </span>
-                    <span className="text-[11px] font-medium text-slate-700 truncate">Sangat Tidak Setuju</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-white/90 border border-emerald-100 shadow-2xs">
-                    <span className="size-5 rounded-lg bg-slate-100 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0 border border-slate-200">
-                      2
-                    </span>
-                    <span className="text-[11px] font-medium text-slate-700 truncate">Kurang Setuju</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-white/90 border border-emerald-100 shadow-2xs">
-                    <span className="size-5 rounded-lg bg-slate-100 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0 border border-slate-200">
-                      3
-                    </span>
-                    <span className="text-[11px] font-medium text-slate-700 truncate">Cukup / Ragu</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-white/90 border border-emerald-100 shadow-2xs">
-                    <span className="size-5 rounded-lg bg-slate-100 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0 border border-slate-200">
-                      4
-                    </span>
-                    <span className="text-[11px] font-medium text-slate-700 truncate">Setuju</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-emerald-100/70 border border-emerald-300 shadow-2xs">
-                    <span className="size-5 rounded-lg bg-emerald-600 text-white font-black text-[11px] flex items-center justify-center shrink-0">
-                      5
-                    </span>
-                    <span className="text-[11px] font-bold text-emerald-950 truncate">Sangat Setuju</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-amber-50 border border-amber-300 shadow-2xs">
-                    <span className="px-1.5 h-5 rounded-lg bg-amber-500 text-white font-black text-[10px] flex items-center justify-center shrink-0">
-                      TD
-                    </span>
-                    <span className="text-[11px] font-bold text-amber-950 truncate">Tidak Tahu / N/A</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Judul Bagian */}
-              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
-                <div className="flex items-center justify-between text-xs font-bold text-slate-800">
-                  <span className="text-emerald-700 uppercase tracking-wide text-[10px]">
-                    Langkah {currentIdx + 1} dari 4: {sec.name}
-                  </span>
-                  <span className="text-slate-400 text-[10px]">
-                    Soal {sec.items[0].no} – {sec.items[sec.items.length - 1].no}
-                  </span>
-                </div>
-                <h3 className="text-sm font-bold text-slate-900 mt-0.5 leading-snug">{sec.title}</h3>
-              </div>
-
-              {/* Daftar Soal */}
-              <div className="space-y-2.5">
-                {sec.items.map((q: any) => {
-                  const selected = likertAnswers[q.no];
-                  return (
-                    <Card
-                      key={q.no}
-                      className={`border rounded-2xl shadow-2xs transition-all bg-white ${
-                        selected ? "border-emerald-300 ring-1 ring-emerald-100" : "border-slate-200"
-                      }`}
-                    >
-                      <CardContent className="p-3.5 space-y-2.5">
-                        <div className="flex items-start gap-2.5">
-                          <span className="shrink-0 size-6 rounded-lg bg-emerald-100 text-emerald-900 font-extrabold text-xs flex items-center justify-center">
-                            {q.no}
-                          </span>
-                          <p className="text-xs text-slate-800 font-semibold leading-relaxed pt-0.5">{q.text}</p>
-                        </div>
-
-                        {/* 6 Tombol Nilai */}
-                        <div className="grid grid-cols-6 gap-1.5 pt-0.5">
-                          {["1", "2", "3", "4", "5", "TD"].map((val) => {
-                            const isChosen = selected === val;
-                            const isTD = val === "TD";
-                            return (
-                              <button
-                                key={val}
-                                type="button"
-                                onClick={() => handleScoreChange(q.no, val)}
-                                className={`py-2 rounded-xl text-xs font-black transition-all border ${
-                                  isChosen
-                                    ? isTD
-                                      ? "bg-amber-500 border-amber-600 text-white shadow-xs"
-                                      : "bg-emerald-600 border-emerald-700 text-white shadow-xs scale-102"
-                                    : isTD
-                                    ? "bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100"
-                                    : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-emerald-50 hover:border-emerald-300"
-                                }`}
-                              >
-                                {val}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-
-              {/* Catatan Khusus */}
-              <Card className="border-slate-200 bg-white rounded-2xl shadow-2xs">
-                <CardContent className="p-3.5 space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Saran atau catatan tambahan untuk {sec.name} (opsional):
-                  </Label>
-                  <Textarea
-                    placeholder="Tulis saran lapang Anda jika ada..."
-                    rows={2}
-                    value={likertNotes[sec.id] || ""}
-                    onChange={(e) => handleSectionNoteChange(sec.id, e.target.value)}
-                    className="text-xs bg-slate-50 rounded-xl"
-                  />
-                </CardContent>
-              </Card>
-
-              {/* Navigasi Lanjut/Kembali */}
-              <div className="flex items-center gap-2 pt-1">
-                <Button
-                  variant="outline"
-                  onClick={handlePrevSection}
-                  className="flex-1 h-11 text-xs rounded-xl font-bold border-slate-200 flex items-center justify-center gap-1.5"
-                >
-                  <ChevronLeft className="size-4" />
-                  <span>Kembali</span>
-                </Button>
-
-                <Button
-                  onClick={handleNextSection}
-                  className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-2xs flex items-center justify-center gap-1.5"
-                >
-                  <span>
-                    {currentIdx < currentLikertSections.length - 1
-                      ? `Lanjut ke ${currentLikertSections[currentIdx + 1].name}`
-                      : "Lanjut ke Cek Foto (Langkah 3)"}
-                  </span>
-                  <ChevronRight className="size-4" />
-                </Button>
-              </div>
-            </div>
-          );
-        })()}
-
-        {/* ================= TAB 3: CEK FOTO CITRA & DATA SENSOR ================= */}
+        {/* ================= TAB 2: CEK FOTO CITRA & DATA SENSOR ================= */}
         {activeTab === "dataset" && (
           <div className="space-y-3.5 animate-in fade-in duration-150">
-            {/* Tombol Pindah Antara Foto & Sensor */}
-            <div className="flex p-1 bg-slate-200 rounded-2xl gap-1">
-              <button
-                type="button"
-                onClick={() => setDatasetSubTab("images")}
-                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                  datasetSubTab === "images"
-                    ? "bg-white text-emerald-800 shadow-2xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                <Leaf className="size-4 text-emerald-600" />
-                <span>Foto Daun & Buah ({totalSamplesCount})</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setDatasetSubTab("sensors")}
-                className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                  datasetSubTab === "sensors"
-                    ? "bg-white text-emerald-800 shadow-2xs"
-                    : "text-slate-600 hover:text-slate-900"
-                }`}
-              >
-                <Cloud className="size-4 text-emerald-600" />
-                <span>Data Sensor Iklim (3 Lokasi)</span>
-              </button>
-            </div>
-
-            {/* SUB-TAB 1: CEK FOTO DAUN & BUAH (3 KOLOM MOBILE GRID) */}
-            {datasetSubTab === "images" && (
+            {/* JIKA BUKAN PAKAR AGROKLIMAT: TAMPILKAN FOTO DAUN & BUAH SAJA (POPT SUKABUMI & FITOPATOLOGI) */}
+            {!isAgroklimat && (
               <div className="space-y-3">
                 {/* Petunjuk Singkat */}
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-2.5 text-xs text-emerald-950 flex items-center gap-2">
-                  <Leaf className="size-4 text-emerald-600 shrink-0" />
-                  <p className="text-[11px] leading-snug">
-                    <b>Ketuk foto</b> untuk memperbesar & memberikan koreksi/komentar jika penyakit tidak sesuai.
-                  </p>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 text-xs text-emerald-950 flex items-center gap-2.5 shadow-2xs">
+                  <div className="size-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <Leaf className="size-4 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-xs">Pemeriksaan Sampel Citra Daun & Buah ({totalSamplesCount} Foto)</p>
+                    <p className="text-[11px] text-emerald-800">
+                      Periksa contoh sampel citra penyakit. <b>Ketuk foto</b> untuk memperbesar & memberikan catatan koreksi jika ada label penyakit yang keliru sebelum mengisi kuesioner.
+                    </p>
+                  </div>
                 </div>
 
                 {/* FILTER TOOLBAR: BAGIAN & KATEGORI PENYAKIT */}
@@ -1151,11 +968,19 @@ export default function MobileFormApp() {
               </div>
             )}
 
-            {/* SUB-TAB 2: DATA SENSOR IKLIM */}
-            {datasetSubTab === "sensors" && (
+            {/* JIKA PAKAR AGROKLIMAT: TAMPILKAN DATA SENSOR IKLIM SAJA */}
+            {isAgroklimat && (
               <div className="space-y-3">
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-950">
-                  <b>Petunjuk:</b> Periksa data suhu dan kelembapan di stasiun kebun berikut. Apakah angkanya wajar?
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3 text-xs text-emerald-950 flex items-center gap-2.5 shadow-2xs">
+                  <div className="size-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <Thermometer className="size-4 text-emerald-600" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-xs">Pemeriksaan Stasiun Sensor Mikroklimat IoT (3 Lokasi)</p>
+                    <p className="text-[11px] text-emerald-800">
+                      Periksa data suhu dan kelembapan di stasiun kebun berikut. Apakah angkanya wajar? Berikan penilaian mutu data sebelum mengisi kuesioner.
+                    </p>
+                  </div>
                 </div>
 
                 <div className="space-y-3">
@@ -1248,34 +1073,217 @@ export default function MobileFormApp() {
               </div>
             )}
 
-            {/* Tombol Lanjut ke Langkah 4 */}
+            {/* Tombol Navigasi Langkah 2 */}
             <div className="flex items-center gap-2 pt-2">
               <Button
                 variant="outline"
                 onClick={() => {
-                  setActiveTab("likert");
-                  setActiveLikertSection("section_f");
+                  setActiveTab("profile");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className="flex-1 h-11 text-xs rounded-xl font-bold border-slate-200 flex items-center justify-center gap-1.5"
               >
                 <ChevronLeft className="size-4" />
-                <span>Kembali ke Soal</span>
+                <span>Kembali ke Profil</span>
               </Button>
 
               <Button
                 onClick={() => {
-                  setActiveTab("recap");
+                  setActiveTab("likert");
+                  setActiveLikertSection("section_c");
                   window.scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-2xs flex items-center justify-center gap-1.5"
               >
-                <span>Lanjut ke Rekomendasi (Langkah 4)</span>
+                <span>Lanjut ke Kuesioner (Langkah 3)</span>
                 <ChevronRight className="size-4" />
               </Button>
             </div>
           </div>
         )}
+
+        {/* ================= TAB 3: KUESIONER LIKERT ================= */}
+        {activeTab === "likert" && (() => {
+          const sectionIndex = currentLikertSections.findIndex((s: any) => s.id === activeLikertSection);
+          const currentIdx = sectionIndex !== -1 ? sectionIndex : 0;
+          const sec = currentLikertSections[currentIdx];
+
+          const handleNextSection = () => {
+            if (currentIdx < currentLikertSections.length - 1) {
+              setActiveLikertSection(currentLikertSections[currentIdx + 1].id);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            } else {
+              setActiveTab("recap");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          };
+
+          const handlePrevSection = () => {
+            if (currentIdx > 0) {
+              setActiveLikertSection(currentLikertSections[currentIdx - 1].id);
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            } else {
+              setActiveTab("dataset");
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          };
+
+          return (
+            <div className="space-y-3.5 animate-in fade-in duration-150">
+              {/* Petunjuk Skala Nilai 1-5 & TD (Rapi & Sejajar) */}
+              <div className="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-3 shadow-2xs">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-bold text-emerald-950 flex items-center gap-1.5">
+                    <span className="size-2 rounded-full bg-emerald-600 inline-block"></span>
+                    Panduan Pilihan Nilai:
+                  </span>
+                  <span className="text-[10px] font-medium text-emerald-700">Skala 1 – 5 & TD</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs">
+                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-white/90 border border-emerald-100 shadow-2xs">
+                    <span className="size-5 rounded-lg bg-slate-100 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0 border border-slate-200">
+                      1
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-700 truncate">Sangat Tidak Setuju</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-white/90 border border-emerald-100 shadow-2xs">
+                    <span className="size-5 rounded-lg bg-slate-100 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0 border border-slate-200">
+                      2
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-700 truncate">Kurang Setuju</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-white/90 border border-emerald-100 shadow-2xs">
+                    <span className="size-5 rounded-lg bg-slate-100 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0 border border-slate-200">
+                      3
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-700 truncate">Cukup / Ragu</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-white/90 border border-emerald-100 shadow-2xs">
+                    <span className="size-5 rounded-lg bg-slate-100 text-slate-700 font-black text-[11px] flex items-center justify-center shrink-0 border border-slate-200">
+                      4
+                    </span>
+                    <span className="text-[11px] font-medium text-slate-700 truncate">Setuju</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-emerald-100/70 border border-emerald-300 shadow-2xs">
+                    <span className="size-5 rounded-lg bg-emerald-600 text-white font-black text-[11px] flex items-center justify-center shrink-0">
+                      5
+                    </span>
+                    <span className="text-[11px] font-bold text-emerald-950 truncate">Sangat Setuju</span>
+                  </div>
+                  <div className="flex items-center gap-2 p-1.5 rounded-xl bg-amber-50 border border-amber-300 shadow-2xs">
+                    <span className="px-1.5 h-5 rounded-lg bg-amber-500 text-white font-black text-[10px] flex items-center justify-center shrink-0">
+                      TD
+                    </span>
+                    <span className="text-[11px] font-bold text-amber-950 truncate">Tidak Tahu / N/A</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Judul Bagian */}
+              <div className="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-2xs">
+                <div className="flex items-center justify-between text-xs font-bold text-slate-800">
+                  <span className="text-emerald-700 uppercase tracking-wide text-[10px]">
+                    Langkah {currentIdx + 1} dari 4: {sec.name}
+                  </span>
+                  <span className="text-slate-400 text-[10px]">
+                    Soal {sec.items[0].no} – {sec.items[sec.items.length - 1].no}
+                  </span>
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 mt-0.5 leading-snug">{sec.title}</h3>
+              </div>
+
+              {/* Daftar Soal */}
+              <div className="space-y-2.5">
+                {sec.items.map((q: any) => {
+                  const selected = likertAnswers[q.no];
+                  return (
+                    <Card
+                      key={q.no}
+                      className={`border rounded-2xl shadow-2xs transition-all bg-white ${
+                        selected ? "border-emerald-300 ring-1 ring-emerald-100" : "border-slate-200"
+                      }`}
+                    >
+                      <CardContent className="p-3.5 space-y-2.5">
+                        <div className="flex items-start gap-2.5">
+                          <span className="shrink-0 size-6 rounded-lg bg-emerald-100 text-emerald-900 font-extrabold text-xs flex items-center justify-center">
+                            {q.no}
+                          </span>
+                          <p className="text-xs text-slate-800 font-semibold leading-relaxed pt-0.5">{q.text}</p>
+                        </div>
+
+                        {/* 6 Tombol Nilai */}
+                        <div className="grid grid-cols-6 gap-1.5 pt-0.5">
+                          {["1", "2", "3", "4", "5", "TD"].map((val) => {
+                            const isChosen = selected === val;
+                            const isTD = val === "TD";
+                            return (
+                              <button
+                                key={val}
+                                type="button"
+                                onClick={() => handleScoreChange(q.no, val)}
+                                className={`py-2 rounded-xl text-xs font-black transition-all border ${
+                                  isChosen
+                                    ? isTD
+                                      ? "bg-amber-500 border-amber-600 text-white shadow-xs"
+                                      : "bg-emerald-600 border-emerald-700 text-white shadow-xs scale-102"
+                                    : isTD
+                                    ? "bg-amber-50 border-amber-200 text-amber-800 hover:bg-amber-100"
+                                    : "bg-slate-50 border-slate-200 text-slate-700 hover:bg-emerald-50 hover:border-emerald-300"
+                                }`}
+                              >
+                                {val}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              {/* Catatan Khusus */}
+              <Card className="border-slate-200 bg-white rounded-2xl shadow-2xs">
+                <CardContent className="p-3.5 space-y-1.5">
+                  <Label className="text-xs font-semibold text-slate-700">
+                    Saran atau catatan tambahan untuk {sec.name} (opsional):
+                  </Label>
+                  <Textarea
+                    placeholder="Tulis saran lapang Anda jika ada..."
+                    rows={2}
+                    value={likertNotes[sec.id] || ""}
+                    onChange={(e) => handleSectionNoteChange(sec.id, e.target.value)}
+                    className="text-xs bg-slate-50 rounded-xl"
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Navigasi Lanjut/Kembali */}
+              <div className="flex items-center gap-2 pt-1">
+                <Button
+                  variant="outline"
+                  onClick={handlePrevSection}
+                  className="flex-1 h-11 text-xs rounded-xl font-bold border-slate-200 flex items-center justify-center gap-1.5"
+                >
+                  <ChevronLeft className="size-4" />
+                  <span>Kembali</span>
+                </Button>
+
+                <Button
+                  onClick={handleNextSection}
+                  className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-2xs flex items-center justify-center gap-1.5"
+                >
+                  <span>
+                    {currentIdx < currentLikertSections.length - 1
+                      ? `Lanjut ke ${currentLikertSections[currentIdx + 1].name}`
+                      : "Lanjut ke Rekomendasi (Langkah 4)"}
+                  </span>
+                  <ChevronRight className="size-4" />
+                </Button>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* ================= TAB 4: REKOMENDASI VALIDATOR ================= */}
         {activeTab === "recap" && (
@@ -1360,13 +1368,13 @@ export default function MobileFormApp() {
                   <Button
                     variant="outline"
                     onClick={() => {
-                      setActiveTab("dataset");
+                      setActiveTab("likert");
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                     className="flex-1 h-11 text-xs rounded-xl font-bold border-slate-200 flex items-center justify-center gap-1.5"
                   >
                     <ChevronLeft className="size-4" />
-                    <span>Kembali ke Foto</span>
+                    <span>Kembali ke Kuesioner</span>
                   </Button>
 
                   <Button

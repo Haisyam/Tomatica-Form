@@ -311,47 +311,54 @@ export function generateValidationPdf(params: PdfExportParams): jsPDF {
   const correctedItems = Object.entries(corrections).filter(([_, c]) => c.isCorrected);
   const sensorEntries = Object.entries(sensorReviews);
 
-  const datasetRows: any[] = [
-    [
-      "Dataset Citra Tomat",
-      `Total 2.888 citra ditinjau (Daun & Buah). Jumlah sampel dikoreksi/diberi catatan: ${correctedItems.length} sampel.`,
-    ],
-  ];
+  const isAgroklimat = validator.role === "agroklimat";
+  const datasetRows: any[] = [];
 
-  if (correctedItems.length > 0) {
-    const listSummary = correctedItems
-      .slice(0, 15)
-      .map(
-        ([id, c], idx) =>
-          `${idx + 1}. [${id}] Catatan Koreksi Ahli: ${c.notes || c.correctDisease || "Ditandai tidak sesuai"}`
-      )
+  if (isAgroklimat) {
+    const sensorSummary = sensorEntries
+      .map(([loc, rev]) => {
+        const locLabel =
+          loc === "samarang_garut"
+            ? "Stasiun Samarang (Garut)"
+            : loc === "gunungmanik_majalengka"
+            ? "Stasiun Gunungmanik (Majalengka)"
+            : "Stasiun Sangiang (Majalengka)";
+        const st = rev.status === "memadai" ? "Wajar / Memadai" : "Perlu Pemeriksaan";
+        return `• ${locLabel}: ${st}${rev.notes ? ` — Catatan: "${rev.notes}"` : ""}`;
+      })
       .join("\n");
-    datasetRows.push(["Rincian Sampel Dikoreksi", listSummary]);
+
+    datasetRows.push(["Status Rekaman Sensor", sensorSummary]);
   } else {
-    datasetRows.push(["Rincian Sampel Dikoreksi", "Semua sampel citra yang ditinjau dinyatakan telah sesuai."]);
+    datasetRows.push([
+      "Dataset Citra Tomat",
+      `Total 2.853 citra ditinjau (Daun & Buah). Jumlah sampel dikoreksi/diberi catatan: ${correctedItems.length} sampel.`,
+    ]);
+
+    if (correctedItems.length > 0) {
+      const listSummary = correctedItems
+        .slice(0, 15)
+        .map(
+          ([id, c], idx) =>
+            `${idx + 1}. [${id}] Catatan Koreksi Ahli: ${c.notes || c.correctDisease || "Ditandai tidak sesuai"}`
+        )
+        .join("\n");
+      datasetRows.push(["Rincian Sampel Dikoreksi", listSummary]);
+    } else {
+      datasetRows.push(["Rincian Sampel Dikoreksi", "Semua sampel citra yang ditinjau dinyatakan telah sesuai."]);
+    }
   }
 
-  const sensorSummary = sensorEntries
-    .map(([loc, rev]) => {
-      const locLabel =
-        loc === "samarang_garut"
-          ? "Stasiun Samarang (Garut)"
-          : loc === "gunungmanik_majalengka"
-          ? "Stasiun Gunungmanik (Majalengka)"
-          : "Stasiun Sangiang (Majalengka)";
-      const st = rev.status === "memadai" ? "Wajar / Memadai" : "Perlu Pemeriksaan";
-      return `• ${locLabel}: ${st}${rev.notes ? ` — Catatan: "${rev.notes}"` : ""}`;
-    })
-    .join("\n");
-
-  datasetRows.push(["Data Sensor Mikroklimat", sensorSummary]);
+  const sectionGTitle = isAgroklimat
+    ? "G. RINGKASAN VALIDASI REKAMAN SENSOR MIKROKLIMAT"
+    : "G. RINGKASAN VALIDASI SAMPEL CITRA PENYAKIT";
 
   autoTable(doc, {
     startY: currentY,
     head: [
       [
         {
-          content: "G. RINGKASAN VALIDASI SAMPEL CITRA & REKAMAN SENSOR",
+          content: sectionGTitle,
           colSpan: 2,
           styles: { fontStyle: "bold", fillColor: [240, 240, 240], textColor: [0, 0, 0] },
         },
